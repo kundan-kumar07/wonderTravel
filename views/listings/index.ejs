@@ -1,0 +1,180 @@
+<% layout("/layouts/boilerplate")%>
+<body>
+  <style>
+    /* Scrollable Filters */
+    /* Ensure filters-container behaves properly */
+.filters-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+}
+
+/* Filters Section */
+#filters {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 0.5rem;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+#filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filter {
+  text-align: center;
+  min-width: 90px;
+  opacity: 0.7;
+  padding: 0.5rem;
+  transition: opacity 0.3s ease;
+}
+
+.filter:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.filter p {
+  font-size: 0.8rem;
+}
+
+/* Tax Toggle Styling */
+.tax-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center align it */
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: #f5f5f5;
+  width: auto;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+/* Tax Toggle Components */
+.form-check-reverse {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.form-check-input {
+  width: 50px;
+  height: 25px;
+  cursor: pointer;
+  accent-color: #007bff;
+  transition: all 0.3s ease;
+}
+
+.form-check-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ✅ Responsive Fix for Small & Medium Screens */
+@media (max-width: 1024px) {
+  .filters-container {
+    flex-direction: column; /* Stack filters and toggle */
+    align-items: center;
+  }
+
+  #filters {
+    width: 100%; /* Full width on smaller screens */
+    justify-content: center;
+  }
+
+  .tax-toggle {
+    width: 100%; /* Full width */
+    justify-content: center;
+    margin-top: 0.5rem; /* Space between filters & toggle */
+  }
+
+  .form-check-reverse {
+    flex-direction: column; /* Stack text & switch vertically */
+    align-items: center;
+  }
+}
+
+
+  </style>
+
+  <!-- Filters Section -->
+  <!-- Filters & Toggle Container -->
+<div class="filters-container">
+  <!-- Filters Section -->
+  <div id="filters">
+    <div class="filter"><div><i class="fa-solid fa-fire"></i></div><p>Trending</p></div>
+    <div class="filter"><div><i class="fa-solid fa-bed"></i></div><p>Rooms</p></div>
+    <div class="filter"><div><i class="fa-solid fa-mountain-city"></i></div><p>Iconic Cities</p></div>
+    <div class="filter"><div><i class="fa-solid fa-mountain"></i></div><p>Mountain</p></div>
+    <div class="filter"><div><i class="fa-solid fa-chess-rook"></i></div><p>Castles</p></div>
+    <div class="filter"><div><i class="fa-solid fa-person-swimming"></i></div><p>Amazing Pools</p></div>
+    <div class="filter"><div><i class="fa-solid fa-campground"></i></div><p>Camping</p></div>
+    <div class="filter"><div><i class="fa-solid fa-tractor"></i></div><p>Farms</p></div>
+    <div class="filter"><div><i class="fa-solid fa-snowflake"></i></div><p>Arctic</p></div>
+    
+    
+
+  </div>
+
+  <!-- Tax Toggle Switch -->
+  <div class="tax-toggle">
+    <div class="form-check-reverse form-switch">
+      <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+    </div>
+  </div>
+</div>
+
+
+  <!-- Listings -->
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-1">
+    <% for(let listing of allListings) { %>
+      <a href="listings/<%= listing._id %>" class="listing-link">
+        <div class="card col">
+          <img src="<%=listing.image.url%>" class="card-img-top" alt="listing_img" style="height: 18rem">
+          <div class="card-img-overlay"></div>
+          <div class="card-body">
+            <p class="card-text">
+              <b><%= listing.title %></b><br>
+              ₹ <span class="listing-price" data-base-price="<%= listing.price %>">
+                <%= listing.price ? listing.price.toLocaleString("en-IN") : "Price not available" %>
+              </span> / night
+              <i class="gst-text" style="display: none;">&nbsp;+18% GST</i>
+            </p>
+          </div>
+        </div>
+      </a>
+    <% } %> 
+  </div>
+
+  <!-- JavaScript for Toggle Functionality -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+      let priceElements = document.querySelectorAll(".listing-price");
+      let gstTexts = document.querySelectorAll(".gst-text");
+
+      taxSwitch.addEventListener("change", () => {
+        let isTaxIncluded = taxSwitch.checked;
+
+        priceElements.forEach((priceElement, index) => {
+          let basePrice = parseFloat(priceElement.dataset.basePrice);
+          if (!isNaN(basePrice)) {
+            let finalPrice = isTaxIncluded ? basePrice * 1.18 : basePrice;
+            priceElement.textContent = `${finalPrice.toLocaleString("en-IN")}`;
+            gstTexts[index].style.display = isTaxIncluded ? "inline" : "none";
+          }
+        });
+      });
+    });
+  </script>
+</body>
